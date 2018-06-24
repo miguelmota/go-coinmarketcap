@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	cmc "github.com/coincircle/go-coinmarketcap"
+	cmc "github.com/miguelmota/go-coinmarketcap"
 )
 
 func main() {
