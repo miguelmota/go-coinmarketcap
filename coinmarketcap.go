@@ -61,6 +61,7 @@ type TickersOptions struct {
 	Start   int
 	Limit   int
 	Convert string
+	Sort    string
 }
 
 // tickerMedia tickers response media
@@ -84,6 +85,9 @@ func Tickers(options *TickersOptions) ([]*types.Ticker, error) {
 	}
 	if options.Convert != "" {
 		params = append(params, fmt.Sprintf("convert=%v", options.Convert))
+	}
+	if options.Sort != "" {
+		params = append(params, fmt.Sprintf("sort=%v", options.Sort))
 	}
 	url := fmt.Sprintf("%s/ticker?%s", baseURL, strings.Join(params, "&"))
 	resp, err := makeReq(url)
