@@ -1,6 +1,9 @@
 <h1 align="center">
   <br />
+  <!--
   <img src="https://user-images.githubusercontent.com/168240/39501128-e66e2a18-4d6d-11e8-9e16-88655102da6c.png" alt="go-coinmarketcap" width="600" />
+  <img src="https://user-images.githubusercontent.com/168240/41822644-de4ad174-77a7-11e8-9156-64b676a94c9c.png" alt="go-coinmarketcap" width="600" />
+  -->
   <br />
   <br />
   <br />
