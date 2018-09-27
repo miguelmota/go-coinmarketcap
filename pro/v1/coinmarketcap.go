@@ -1,0 +1,489 @@
+// Package coinmarketcap Coin Market Cap API client for Go
+package coinmarketcap
+
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/c3systems/vendor.bak/github.com/davecgh/go-spew/spew"
+	"github.com/miguelmota/go-coinmarketcap/v2/types"
+)
+
+var (
+	siteURL               = "https://coinmarketcap.com"
+	baseURL               = "https://pro-api.coinmarketcap.com/v1"
+	coinGraphURL          = "https://graphs2.coinmarketcap.com/currencies"
+	globalMarketGraphURL  = "https://graphs2.coinmarketcap.com/global/marketcap-total"
+	altcoinMarketGraphURL = "https://graphs2.coinmarketcap.com/global/marketcap-altcoin"
+)
+
+// Interface interface
+type Interface interface {
+	Listings() ([]*types.Listing, error)
+	/*
+		Tickers(options *TickersOptions) ([]*types.Ticker, error)
+		Ticker(options *TickerOptions) (*types.Ticker, error)
+		TickerGraph(options *TickerGraphOptions) (*types.TickerGraph, error)
+		GlobalMarket(options *GlobalMarketOptions) (*types.GlobalMarket, error)
+		GlobalMarketGraph(options *GlobalMarketGraphOptions) (*types.MarketGraph, error)
+		GlobalAltcoinMarketGraph(options *GlobalAltcoinMarketGraphOptions) (*types.MarketGraph, error)
+		Markets(options *MarketsOptions) ([]*types.Market, error)
+		Price(options *PriceOptions) (float64, error)
+		CoinID(symbol string) (int, error)
+		CoinSlug(symbol string) (string, error)
+	*/
+}
+
+// listingsMedia listings response media
+type listingsMedia struct {
+	Data []*types.Listing `json:"data"`
+}
+
+/*
+client := cmc.New(cmc.Config{
+	ProAPIKey: "02585d6d-fa6a-460c-833c-3146576cbc70",
+})
+
+listings, err := client.Cryptocurrency.Listings.Latest(cmc.ListingParams{
+})
+*/
+
+// Status is the status structure
+type Status struct {
+	Timestamp    string  `json:"timestamp"`
+	ErrorCode    int     `json:"error_code"`
+	ErrorMessage *string `json:"error_message"`
+	Elapsed      int     `json:"elapsed"`
+	CreditCount  int     `json:"credit_count"`
+}
+
+// Response is the response structure
+type Response struct {
+	Status Status      `json:"status"`
+	Data   interface{} `json:"data"`
+}
+
+// Listing is the listing structure
+type Listing struct {
+	ID                float64           `json:"id"`
+	Name              string            `json:"name"`
+	Symbol            string            `json:"symbol"`
+	Slug              string            `json:"website_slug"`
+	CirculatingSupply float64           `json:"circulating_supply"`
+	TotalSupply       float64           `json:"total_supply"`
+	MaxSupply         float64           `json:"max_supply"`
+	DateAdded         string            `json:"date_added"`
+	NumMarketPairs    float64           `json:"num_market_pairs"`
+	CMCRank           float64           `json:"cmc_rank"`
+	LastUpdated       string            `json:"last_updated"`
+	Quote             map[string]*Quote `json:"quote"`
+}
+
+// Quote is the quote structure
+type Quote struct {
+	Price            float64 `json:"price"`
+	Volume24H        float64 `json:"volume_24h"`
+	PercentChange1H  float64 `json:"percent_change_1h"`
+	PercentChange24H float64 `json:"percent_change_24h"`
+	PercentChange7D  float64 `json:"percent_change_7d"`
+	MarketCap        float64 `json:"market_cap"`
+	LastUpdated      string  `json:"last_updated"`
+}
+
+// Client the CoinMarketCap client
+type Client struct {
+	proAPIKey string
+}
+
+// Config the client config structure
+type Config struct {
+	ProAPIKey string
+}
+
+// NewClient initializes a new client
+func NewClient(cfg *Config) *Client {
+	return &Client{
+		proAPIKey: cfg.ProAPIKey,
+	}
+}
+
+// CryptocurrencyListingsLatests gets the all cryptocurrencies (latest)
+func (s *Client) CryptocurrencyListingsLatests() ([]*Listing, error) {
+	var params []string
+
+	params = append(params, fmt.Sprintf("start=%v", 1))
+	params = append(params, fmt.Sprintf("limit=%v", 1))
+	params = append(params, fmt.Sprintf("convert=%s", "USD"))
+
+	url := fmt.Sprintf("%s/cryptocurrency/listings/latest?%s", baseURL, strings.Join(params, "&"))
+
+	body, err := s.makeReq(url)
+	fmt.Println(string(body))
+	resp := new(Response)
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var listings []*Listing
+	ifcs, ok := resp.Data.([]interface{})
+	if ok {
+		for _, v := range ifcs {
+			spew.Dump(v)
+			res, ok := v.(*Listing)
+			if ok {
+				//listings = append(listings, res)
+			}
+			if !ok {
+				fmt.Println("not ok")
+			}
+			_ = res
+		}
+	}
+
+	/*
+		//var listings []*Listing
+		r, ok := resp.Data.([]*Listing)
+		if !ok {
+			return nil, errors.New("not ok")
+		}
+	*/
+
+	return listings, nil
+}
+
+/*
+// TickersOptions options for tickers method
+type TickersOptions struct {
+	Start   int
+	Limit   int
+	Convert string
+	Sort    string
+}
+
+// tickerMedia tickers response media
+type tickersMedia struct {
+	Data     map[string]*types.Ticker `json:"data,omitempty"`
+	Metadata struct {
+		Timestamp           int64
+		NumCryptoCurrencies int    `json:"num_cryptocurrencies,omitempty"`
+		Error               string `json:",omitempty"`
+	}
+}
+
+// Tickers gets ticker information on coins
+func Tickers(options *TickersOptions) ([]*types.Ticker, error) {
+	var params []string
+	if options.Start >= 0 {
+		params = append(params, fmt.Sprintf("start=%v", options.Start))
+	}
+	if options.Limit >= 0 {
+		params = append(params, fmt.Sprintf("limit=%v", options.Limit))
+	}
+	if options.Convert != "" {
+		params = append(params, fmt.Sprintf("convert=%v", options.Convert))
+	}
+	if options.Sort != "" {
+		params = append(params, fmt.Sprintf("sort=%v", options.Sort))
+	}
+	url := fmt.Sprintf("%s/ticker?%s", baseURL, strings.Join(params, "&"))
+	resp, err := makeReq(url)
+	var body tickersMedia
+	err = json.Unmarshal(resp, &body)
+	if err != nil {
+		return nil, err
+	}
+	data := body.Data
+	var tickers []*types.Ticker
+	for _, v := range data {
+		tickers = append(tickers, v)
+	}
+
+	if body.Metadata.Error != "" {
+		return nil, errors.New(body.Metadata.Error)
+	}
+
+	sort.Slice(tickers, func(i, j int) bool {
+		return tickers[i].Rank < tickers[j].Rank
+	})
+
+	return tickers, nil
+}
+
+// TickerOptions options for ticker method
+type TickerOptions struct {
+	Symbol  string
+	Convert string
+}
+
+type tickerMedia struct {
+	Data *types.Ticker `json:"data"`
+}
+
+// Ticker gets ticker information about a cryptocurrency
+func Ticker(options *TickerOptions) (*types.Ticker, error) {
+	var params []string
+	if options.Convert != "" {
+		params = append(params, fmt.Sprintf("convert=%v", options.Convert))
+	}
+	id, err := CoinID(options.Symbol)
+	if err != nil {
+		return nil, err
+	}
+	url := fmt.Sprintf("%s/ticker/%v?%s", baseURL, id, strings.Join(params, "&"))
+	resp, err := makeReq(url)
+	if err != nil {
+		return nil, err
+	}
+	var body tickerMedia
+	err = json.Unmarshal(resp, &body)
+	if err != nil {
+		return nil, err
+	}
+	return body.Data, nil
+}
+
+// TickerGraphOptions options for ticker graph
+type TickerGraphOptions struct {
+	Symbol string
+	Start  int64
+	End    int64
+}
+
+// TickerGraph gets graph data points for a cryptocurrency
+func TickerGraph(options *TickerGraphOptions) (*types.TickerGraph, error) {
+	slug, err := CoinSlug(options.Symbol)
+	if err != nil {
+		return nil, err
+	}
+	url := fmt.Sprintf("%s/%s/%d/%d", coinGraphURL, slug, options.Start*1000, options.End*1000)
+	resp, err := makeReq(url)
+	if err != nil {
+		return nil, err
+	}
+	var data *types.TickerGraph
+	err = json.Unmarshal(resp, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// GlobalMarketOptions options for global data method
+type GlobalMarketOptions struct {
+	Convert string
+}
+
+// globalMedia global data response media
+type globalMarketMedia struct {
+	Data *types.GlobalMarket `json:"data"`
+}
+
+// GlobalMarket gets information about the global market of the cryptocurrencies
+func GlobalMarket(options *GlobalMarketOptions) (*types.GlobalMarket, error) {
+	var params []string
+	if options.Convert != "" {
+		params = append(params, fmt.Sprintf("convert=%v", options.Convert))
+	}
+	url := fmt.Sprintf("%s/global?%s", baseURL, strings.Join(params, "&"))
+	resp, err := makeReq(url)
+	var body globalMarketMedia
+	err = json.Unmarshal(resp, &body)
+	if err != nil {
+		return nil, err
+	}
+	return body.Data, nil
+}
+
+// GlobalMarketGraphOptions options for global market graph method
+type GlobalMarketGraphOptions struct {
+	Start int64
+	End   int64
+}
+
+// GlobalMarketGraph get graph data points of global market
+func GlobalMarketGraph(options *GlobalMarketGraphOptions) (*types.MarketGraph, error) {
+	url := fmt.Sprintf("%s/%d/%d", globalMarketGraphURL, options.Start*1000, options.End*1000)
+	resp, err := makeReq(url)
+	if err != nil {
+		return nil, err
+	}
+	var data *types.MarketGraph
+	err = json.Unmarshal(resp, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// GlobalAltcoinMarketGraphOptions options for global altcoin market graph method
+type GlobalAltcoinMarketGraphOptions struct {
+	Start int64
+	End   int64
+}
+
+// GlobalAltcoinMarketGraph gets graph data points of altcoin market
+func GlobalAltcoinMarketGraph(options *GlobalAltcoinMarketGraphOptions) (*types.MarketGraph, error) {
+	url := fmt.Sprintf("%s/%d/%d", altcoinMarketGraphURL, options.Start*1000, options.End*1000)
+	resp, err := makeReq(url)
+	if err != nil {
+		return nil, err
+	}
+	var data *types.MarketGraph
+	err = json.Unmarshal(resp, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
+// MarketsOptions options for markets method
+type MarketsOptions struct {
+	Symbol string
+}
+
+// Markets get market data for a cryptocurrency
+func Markets(options *MarketsOptions) ([]*types.Market, error) {
+	slug, err := CoinSlug(options.Symbol)
+	if err != nil {
+		return nil, err
+	}
+	url := fmt.Sprintf("%s/currencies/%s/#markets", siteURL, slug)
+	var markets []*types.Market
+	response, err := soup.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	rows := soup.HTMLParse(response).Find("table", "id", "markets-table").Find("tbody").FindAll("tr")
+	for _, row := range rows {
+		var data []string
+		for _, column := range row.FindAll("td") {
+			attrs := column.Attrs()
+			if attrs["data-sort"] != "" {
+				data = append(data, attrs["data-sort"])
+			} else {
+				data = append(data, column.Text())
+			}
+		}
+		markets = append(markets, &types.Market{
+			Rank:          toInt(data[0]),
+			Exchange:      data[1],
+			Pair:          data[2],
+			VolumeUSD:     toFloat(data[3]),
+			Price:         toFloat(data[4]),
+			VolumePercent: toFloat(data[5]),
+			Updated:       data[6],
+		})
+	}
+	return markets, nil
+}
+
+// PriceOptions options for price method
+type PriceOptions struct {
+	Symbol  string
+	Convert string
+}
+
+// Price gets price of a cryptocurrency
+func Price(options *PriceOptions) (float64, error) {
+	coin, err := Ticker(&TickerOptions{
+		Convert: options.Convert,
+		Symbol:  options.Symbol,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	if coin == nil {
+		return 0, errors.New("coin not found")
+	}
+	return coin.Quotes[options.Convert].Price, nil
+}
+
+// CoinID gets the ID for the cryptocurrency
+func CoinID(symbol string) (int, error) {
+	symbol = strings.ToUpper(strings.TrimSpace(symbol))
+	listings, err := Listings()
+	if err != nil {
+		return 0, err
+	}
+
+	for _, l := range listings {
+		if l.Symbol == symbol {
+			return l.ID, nil
+		}
+	}
+	//returns error as default
+	return 0, errors.New("coin not found")
+}
+
+// CoinSlug gets the slug for the cryptocurrency
+func CoinSlug(symbol string) (string, error) {
+	symbol = strings.ToUpper(strings.TrimSpace(symbol))
+	coin, err := Ticker(&TickerOptions{
+		Symbol: symbol,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	if coin == nil {
+		return "", errors.New("coin not found")
+	}
+	return coin.Slug, nil
+}
+*/
+
+// toInt helper for parsing strings to int
+func toInt(rawInt string) int {
+	parsed, _ := strconv.Atoi(strings.Replace(strings.Replace(rawInt, "$", "", -1), ",", "", -1))
+	return parsed
+}
+
+// toFloat helper for parsing strings to float
+func toFloat(rawFloat string) float64 {
+	parsed, _ := strconv.ParseFloat(strings.Replace(strings.Replace(strings.Replace(rawFloat, "$", "", -1), ",", "", -1), "%", "", -1), 64)
+	return parsed
+}
+
+// doReq HTTP client
+func doReq(req *http.Request) ([]byte, error) {
+	requestTimeout := time.Duration(5 * time.Second)
+	client := &http.Client{
+		Timeout: requestTimeout,
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if 200 != resp.StatusCode {
+		return nil, fmt.Errorf("%s", body)
+	}
+
+	return body, nil
+}
+
+// makeReq HTTP request helper
+func (s *Client) makeReq(url string) ([]byte, error) {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("X-CMC_PRO_API_KEY", s.proAPIKey)
+	resp, err := doReq(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, err
+}
