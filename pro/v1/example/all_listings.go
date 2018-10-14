@@ -8,8 +8,8 @@ import (
 )
 
 func main() {
-	client := cmc.NewClient(&Config{
-		ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
+	client := cmc.NewClient(&cmc.Config{
+	//ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
 	})
 
 	listings, err := client.CryptocurrencyListingsLatests(&cmc.CryptocurrencyListingsLatestsOptions{
@@ -19,6 +19,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(listings[0].Name)
-	fmt.Println(listings[0].Quote["USD"].Price)
+	fmt.Println(listings[0].Name)               // "Bitcoin"
+	fmt.Println(listings[0].Quote["USD"].Price) // 6316.75736886
 }

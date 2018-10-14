@@ -13,7 +13,7 @@
 
 [![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/go-coinmarketcap/master/LICENSE.md) [![Build Status](https://travis-ci.org/miguelmota/go-coinmarketcap.svg?branch=master)](https://travis-ci.org/miguelmota/go-coinmarketcap) [![Go Report Card](https://goreportcard.com/badge/github.com/miguelmota/go-coinmarketcap?)](https://goreportcard.com/report/github.com/miguelmota/go-coinmarketcap) [![GoDoc](https://godoc.org/github.com/miguelmota/go-coinmarketcap?status.svg)](https://godoc.org/github.com/miguelmota/go-coinmarketcap)
 
-Supports the CoinMarketCap API Pro Version, [V2](https://coinmarketcap.com/api) and V1 Public API
+Supports the CoinMarketCap API [Pro Version](https://pro.coinmarketcap.com/api/v1), [V2](https://coinmarketcap.com/api) and V1 Public API
 
 ## Documentation
 
@@ -30,21 +30,21 @@ go get -u github.com/miguelmota/go-coinmarketcap
 | Type           | Endpoint                               | Implemented? |
 |----------------|----------------------------------------|--------------|
 | Cryptocurrency | /v1/cryptocurrency/info                | Yes          |
-| Cryptocurrency | /v1/cryptocurrency/map                 | Not yet      |
+| Cryptocurrency | /v1/cryptocurrency/map                 | -      |
 | Cryptocurrency | /v1/cryptocurrency/listings/latest     | Yes          |
-| Cryptocurrency | /v1/cryptocurrency/market-pairs/latest | Not yet      |
-| Cryptocurrency | /v1/cryptocurrency/ohlcv/historical    | Not yet      |
-| Cryptocurrency | /v1/cryptocurrency/quotes/latest       | Not yet      |
-| Cryptocurrency | /v1/cryptocurrency/quotes/historical   | Not yet      |
-| Exchange       | /v1/exchange/info                      | Not yet      |
-| Exchange       | /v1/exchange/map                       | Not yet      |
-| Exchange       | /v1/exchange/listings/latest           | Not yet      |
-| Exchange       | /v1/exchange/market-pairs/latest       | Not yet      |
-| Exchange       | /v1/exchange/quotes/latest             | Not yet      |
-| Exchange       | /v1/exchange/quotes/historical         | Not yet      |
-| Global Metrics | /v1/global-metrics/quotes/latest       | Not yet      |
-| Global Metrics | /v1/global-metrics/quotes/historical   | Not yet      |
-| Tools          | /v1/tools/price-conversion             | Not yet      |
+| Cryptocurrency | /v1/cryptocurrency/market-pairs/latest | -      |
+| Cryptocurrency | /v1/cryptocurrency/ohlcv/historical    | -      |
+| Cryptocurrency | /v1/cryptocurrency/quotes/latest       | -      |
+| Cryptocurrency | /v1/cryptocurrency/quotes/historical   | -      |
+| Exchange       | /v1/exchange/info                      | -      |
+| Exchange       | /v1/exchange/map                       | -      |
+| Exchange       | /v1/exchange/listings/latest           | -      |
+| Exchange       | /v1/exchange/market-pairs/latest       | -      |
+| Exchange       | /v1/exchange/quotes/latest             | -      |
+| Exchange       | /v1/exchange/quotes/historical         | -      |
+| Global Metrics | /v1/global-metrics/quotes/latest       | -      |
+| Global Metrics | /v1/global-metrics/quotes/historical   | -      |
+| Tools          | /v1/tools/price-conversion             | -      |
 
 ### Getting started
 
@@ -59,7 +59,7 @@ import (
 )
 
 func main() {
-	client := cmc.NewClient(&Config{
+	client := cmc.NewClient(&cmc.Config{
 		ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
 	})
 
@@ -70,8 +70,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(listings[0].Name)
-	fmt.Println(listings[0].Quote["USD"].Price)
+	fmt.Println(listings[0].Name)               // "Bitcoin"
+	fmt.Println(listings[0].Quote["USD"].Price) // 6316.75736886
 }
 ```
 
@@ -83,7 +83,7 @@ For more examples, check out the [`./pro/v1/example`](./pro/v1/example) director
 
 ## V2
 
-Note: will be deprecated December 2018
+NOTE: CoinMarketCap will deprecated this API on December 2018
 
 ### Getting started
 
@@ -121,7 +121,7 @@ For more examples, check out the [`./v2/example`](./v2/example) directory and [d
 
 ## V1
 
-Note: will be deprecated November 2018
+NOTE: CoinMarketCap will deprecated this API on November 2018
 
 ### Getting started
 
@@ -154,8 +154,6 @@ func main() {
 ### Examples
 
 For more examples, check out the [`./v1/example`](./v1/example) directory and [documentation](https://godoc.org/github.com/miguelmota/go-coinmarketcap/v1)
-
----
 
 ## License
 
