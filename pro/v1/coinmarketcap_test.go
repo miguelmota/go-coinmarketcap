@@ -23,8 +23,8 @@ func TestCryptocurrencyInfo(t *testing.T) {
 	}
 }
 
-func TestCryptocurrencyListingsLatests(t *testing.T) {
-	listings, err := client.CryptocurrencyListingsLatests(&CryptocurrencyListingsLatestsOptions{
+func TestCryptocurrencyListingsLatest(t *testing.T) {
+	listings, err := client.CryptocurrencyListingsLatest(&CryptocurrencyListingsLatestOptions{
 		Limit: 1,
 	})
 	if err != nil {

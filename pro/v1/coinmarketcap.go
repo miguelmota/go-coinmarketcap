@@ -13,7 +13,7 @@ import (
 // Interface interface
 type Interface interface {
 	CryptocurrencyInfo(options *CryptocurrencyInfoOptions) (map[string]*CryptocurrencyInfo, error)
-	CryptocurrencyListingsLatests(options *CryptocurrencyListingsLatestsOptions) ([]*Listing, error)
+	CryptocurrencyListingsLatest(options *CryptocurrencyListingsLatestOptions) ([]*Listing, error)
 }
 
 // Status is the status structure
@@ -76,8 +76,8 @@ type CryptocurrencyInfoOptions struct {
 	Symbol string
 }
 
-// CryptocurrencyListingsLatestsOptions options
-type CryptocurrencyListingsLatestsOptions struct {
+// CryptocurrencyListingsLatestOptions options
+type CryptocurrencyListingsLatestOptions struct {
 	Start   int
 	Limit   int
 	Convert string
@@ -189,11 +189,11 @@ func (s *Client) CryptocurrencyInfo(options *CryptocurrencyInfoOptions) (map[str
 	return result, nil
 }
 
-// CryptocurrencyListingsLatests gets a paginated list of all cryptocurrencies with latest market data. You can configure this call to sort by market cap or another market ranking field. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
-func (s *Client) CryptocurrencyListingsLatests(options *CryptocurrencyListingsLatestsOptions) ([]*Listing, error) {
+// CryptocurrencyListingsLatest gets a paginated list of all cryptocurrencies with latest market data. You can configure this call to sort by market cap or another market ranking field. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
+func (s *Client) CryptocurrencyListingsLatest(options *CryptocurrencyListingsLatestOptions) ([]*Listing, error) {
 	var params []string
 	if options == nil {
-		options = new(CryptocurrencyListingsLatestsOptions)
+		options = new(CryptocurrencyListingsLatestOptions)
 	}
 	if options.Start != 0 {
 		params = append(params, fmt.Sprintf("start=%v", options.Start))

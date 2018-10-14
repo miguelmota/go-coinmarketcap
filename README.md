@@ -60,15 +60,17 @@ func main() {
 		ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
 	})
 
-	listings, err := client.CryptocurrencyListingsLatests(&cmc.CryptocurrencyListingsLatestsOptions{
+	listings, err := client.CryptocurrencyListingsLatest(&cmc.CryptocurrencyListingsLatestOptions{
 		Limit: 1,
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(listings[0].Name)               // "Bitcoin"
-	fmt.Println(listings[0].Quote["USD"].Price) // 6316.75736886
+	for _, listing := range listings {
+		fmt.Println(listing.Name)               // "Bitcoin"
+		fmt.Println(listing.Quote["USD"].Price) // 6316.75736886
+	}
 }
 ```
 
