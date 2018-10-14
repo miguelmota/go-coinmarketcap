@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"log"
 
-	cmc "github.com/miguelmota/go-coinmarketcap"
+	cmc "github.com/miguelmota/go-coinmarketcap/v2"
 )
 
 func main() {
 	// Get info about coin
-	ticker, err := cmc.Ticker(&cmc.TickerOptions{
+	price, err := cmc.Price(&cmc.PriceOptions{
 		Symbol:  "ETH",
 		Convert: "EUR",
 	})
@@ -17,5 +17,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(ticker.Name, ticker.Quotes["EUR"].Price)
+	fmt.Println(price)
 }
