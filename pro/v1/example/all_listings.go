@@ -9,7 +9,7 @@ import (
 
 func main() {
 	client := cmc.NewClient(&cmc.Config{
-	//ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
+		ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
 	})
 
 	listings, err := client.CryptocurrencyListingsLatest(&cmc.CryptocurrencyListingsLatestOptions{
