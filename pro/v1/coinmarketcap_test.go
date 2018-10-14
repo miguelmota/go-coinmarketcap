@@ -1,22 +1,37 @@
 package coinmarketcap
 
 import (
-	"fmt"
 	"testing"
 )
 
-func TestCryptocurrencyListingsLatests(t *testing.T) {
-	client := NewClient(&Config{
-		ProAPIKey: "02585d6d-fa6a-460c-833c-3146576cbc70",
-	})
+var proAPIKey = "02585d6d-fa6a-460c-833c-3146576cbc70"
+var client = NewClient(&Config{
+	ProAPIKey: proAPIKey,
+})
 
-	//listings, err := client.Cryptocurrency.Listings.Latest()
-	resp, err := client.CryptocurrencyListingsLatests()
+func TestCryptocurrencyListingsLatests(t *testing.T) {
+	listings, err := client.CryptocurrencyListingsLatests(&CryptocurrencyListingsLatestsOptions{
+		Limit: 1,
+	})
 	if err != nil {
 		t.Error(err)
 	}
 
-	fmt.Println(resp)
+	if len(listings) == 0 {
+		t.FailNow()
+	}
+	if listings[0].Name != "Bitcoin" {
+		t.FailNow()
+	}
+	if listings[0].Quote["USD"].Price <= 0 {
+		t.FailNow()
+	}
+}
+
+func TestSortOptions(t *testing.T) {
+	if SortOptions.MarketCap != "market_cap" {
+		t.FailNow()
+	}
 }
 
 /*
