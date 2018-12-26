@@ -214,7 +214,7 @@ func (s *Client) CryptocurrencyListingsLatest(options *CryptocurrencyListingsLat
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
 	}
 
 	var listings []*Listing
