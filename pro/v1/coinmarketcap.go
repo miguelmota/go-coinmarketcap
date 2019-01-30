@@ -47,6 +47,22 @@ type Listing struct {
 	Quote             map[string]*Quote `json:"quote"`
 }
 
+// QuoteLatest is the quotes structure
+type QuoteLatest struct {
+	ID                float64           `json:"id"`
+	Name              string            `json:"name"`
+	Symbol            string            `json:"symbol"`
+	Slug              string            `json:"slug"`
+	CirculatingSupply float64           `json:"circulating_supply"`
+	TotalSupply       float64           `json:"total_supply"`
+	MaxSupply         float64           `json:"max_supply"`
+	DateAdded         string            `json:"date_added"`
+	NumMarketPairs    float64           `json:"num_market_pairs"`
+	CMCRank           float64           `json:"cmc_rank"`
+	LastUpdated       string            `json:"last_updated"`
+	Quote             map[string]*Quote `json:"quote"`
+}
+
 // Quote is the quote structure
 type Quote struct {
 	Price            float64 `json:"price"`
@@ -82,6 +98,12 @@ type CryptocurrencyListingsLatestOptions struct {
 	Limit   int
 	Convert string
 	Sort    string
+}
+
+// CryptocurrencyQuotesLatestOptions options
+type CryptocurrencyQuotesLatestOptions struct {
+	Convert string
+	Symbol  string
 }
 
 // SortOptions sort options
@@ -238,6 +260,53 @@ func (s *Client) CryptocurrencyListingsLatest(options *CryptocurrencyListingsLat
 	}
 
 	return listings, nil
+}
+
+// CryptocurrencyQuotesLatest gets latest quote for each specified symbol. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
+func (s *Client) CryptocurrencyQuotesLatest(options *CryptocurrencyQuotesLatestOptions) ([]*QuoteLatest, error) {
+	var params []string
+	if options == nil {
+		options = new(CryptocurrencyQuotesLatestOptions)
+	}
+
+	if options.Symbol != "" {
+		params = append(params, fmt.Sprintf("symbol=%s", options.Symbol))
+	}
+
+	if options.Convert != "" {
+		params = append(params, fmt.Sprintf("convert=%s", options.Convert))
+	}
+
+	url := fmt.Sprintf("%s/cryptocurrency/quotes/latest?%s", baseURL, strings.Join(params, "&"))
+
+	body, err := s.makeReq(url)
+	resp := new(Response)
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
+	}
+
+	var quotesLatest []*QuoteLatest
+	ifcs, ok := resp.Data.(interface{})
+	if !ok {
+		return nil, ErrCouldNotCast
+	}
+
+	for _, coinObj := range ifcs.(map[string]interface{}) {
+		quoteLatest := new(QuoteLatest)
+		b, err := json.Marshal(coinObj)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(b, quoteLatest)
+		if err != nil {
+			return nil, err
+		}
+
+		quotesLatest = append(quotesLatest, quoteLatest)
+	}
+	return quotesLatest, nil
 }
 
 func init() {
