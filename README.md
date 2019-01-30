@@ -31,7 +31,7 @@ go get -u github.com/miguelmota/go-coinmarketcap
 | Cryptocurrency | /v1/cryptocurrency/listings/latest     | Yes          |
 | Cryptocurrency | /v1/cryptocurrency/market-pairs/latest | -      |
 | Cryptocurrency | /v1/cryptocurrency/ohlcv/historical    | -      |
-| Cryptocurrency | /v1/cryptocurrency/quotes/latest       | -      |
+| Cryptocurrency | /v1/cryptocurrency/quotes/latest       | Yes    |
 | Cryptocurrency | /v1/cryptocurrency/quotes/historical   | -      |
 | Exchange       | /v1/exchange/info                      | -      |
 | Exchange       | /v1/exchange/map                       | -      |
