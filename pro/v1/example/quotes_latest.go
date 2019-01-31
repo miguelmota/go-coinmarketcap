@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 )
@@ -13,15 +12,17 @@ func main() {
 	})
 
 	quotesLatest, err := client.CryptocurrencyQuotesLatest(&cmc.CryptocurrencyQuotesLatestOptions{
-		Symbol:  "BTC", //add comma and other coin symbol e.g.: "BTC,ETH,XRP"
-		Convert: "BRL", //add comma and other coin symbol e.g.: "BRL,USD"
+		Symbol:  "BTC",
+		Convert: "BRL",
 	})
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for _, quote := range quotesLatest {
-		fmt.Println(quote.Name)               // "Bitcoin"
-		fmt.Println(quote.Quote["BRL"].Price) // 12880.958109581403 // BTC price converted to BRL
+		fmt.Println(quote.Name) // "Bitcoin"
+
+		// BTC price converted to BRL
+		fmt.Println(quote.Quote["BRL"].Price) // 12880.958109581403
 	}
 }

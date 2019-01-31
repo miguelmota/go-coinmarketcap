@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 )
@@ -16,7 +15,7 @@ func main() {
 		Limit: 1,
 	})
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for _, listing := range listings {

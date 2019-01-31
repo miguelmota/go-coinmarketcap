@@ -102,8 +102,10 @@ type CryptocurrencyListingsLatestOptions struct {
 
 // CryptocurrencyQuotesLatestOptions options
 type CryptocurrencyQuotesLatestOptions struct {
+	// Covert suppots multiple currencies command separated. eg. "BRL,USD"
 	Convert string
-	Symbol  string
+	// Symbols suppots multiple tickers command separated. eg. "BTC,ETH,XRP"
+	Symbol string
 }
 
 // SortOptions sort options

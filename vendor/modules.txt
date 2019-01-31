@@ -1,0 +1,5 @@
+# github.com/anaskhan96/soup v1.0.1
+github.com/anaskhan96/soup
+# golang.org/x/net v0.0.0-20180215212450-dc948dff8834
+golang.org/x/net/html
+golang.org/x/net/html/atom
