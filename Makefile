@@ -14,5 +14,4 @@ test/pro/v1:
 	@go test -v pro/v1/*.go
 
 .PHONY: test
-test:
-	@go test -v
+test: test/v1 test/v2 test/pro/v1
