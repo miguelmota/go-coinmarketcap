@@ -82,7 +82,7 @@ For more examples, check out the [`./pro/v1/example`](./pro/v1/example) director
 
 ## V2
 
-NOTE: CoinMarketCap will deprecated this API on December 2018
+NOTE: CoinMarketCap deprecated this API on December 2018
 
 ### Getting started
 
@@ -120,7 +120,7 @@ For more examples, check out the [`./v2/example`](./v2/example) directory and [d
 
 ## V1
 
-NOTE: CoinMarketCap will deprecated this API on November 2018
+NOTE: CoinMarketCap deprecated this API on November 2018
 
 ### Getting started
 
