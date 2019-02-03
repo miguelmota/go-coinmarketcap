@@ -2,16 +2,17 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 )
 
 func main() {
 	client := cmc.NewClient(&cmc.Config{
-		ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
+		ProAPIKey: os.Getenv("CMC_PRO_API_KEY"),
 	})
 
-	listings, err := client.CryptocurrencyListingsLatest(&cmc.CryptocurrencyListingsLatestOptions{
+	listings, err := client.Cryptocurrency.LatestListings(&cmc.ListingOptions{
 		Limit: 1,
 	})
 	if err != nil {

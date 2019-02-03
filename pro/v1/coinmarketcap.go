@@ -10,11 +10,20 @@ import (
 	"strings"
 )
 
-// Interface interface
-type Interface interface {
-	CryptocurrencyInfo(options *CryptocurrencyInfoOptions) (map[string]*CryptocurrencyInfo, error)
-	CryptocurrencyListingsLatest(options *CryptocurrencyListingsLatestOptions) ([]*Listing, error)
+// Client the CoinMarketCap client
+type Client struct {
+	proAPIKey      string
+	Cryptocurrency *CryptocurrencyService
+	common         service
 }
+
+// Config the client config structure
+type Config struct {
+	ProAPIKey string
+}
+
+// CryptocurrencyService ...
+type CryptocurrencyService service
 
 // Status is the status structure
 type Status struct {
@@ -86,26 +95,30 @@ type CryptocurrencyInfo struct {
 	Urls     map[string]interface{} `json:"urls"`
 }
 
-// CryptocurrencyInfoOptions options
-type CryptocurrencyInfoOptions struct {
+// InfoOptions options
+type InfoOptions struct {
 	ID     string
 	Symbol string
 }
 
-// CryptocurrencyListingsLatestOptions options
-type CryptocurrencyListingsLatestOptions struct {
+// ListingOptions options
+type ListingOptions struct {
 	Start   int
 	Limit   int
 	Convert string
 	Sort    string
 }
 
-// CryptocurrencyQuotesLatestOptions options
-type CryptocurrencyQuotesLatestOptions struct {
+// QuoteOptions options
+type QuoteOptions struct {
 	// Covert suppots multiple currencies command separated. eg. "BRL,USD"
 	Convert string
 	// Symbols suppots multiple tickers command separated. eg. "BTC,ETH,XRP"
 	Symbol string
+}
+
+type service struct {
+	client *Client
 }
 
 // SortOptions sort options
@@ -127,19 +140,9 @@ type sortOptions struct {
 	PercentChange7D   string
 }
 
-// Client the CoinMarketCap client
-type Client struct {
-	proAPIKey string
-}
-
-// Config the client config structure
-type Config struct {
-	ProAPIKey string
-}
-
 var (
-	// ErrCouldNotCast could not cast error
-	ErrCouldNotCast = errors.New("could not cast")
+	// ErrTypeAssertion is type assertion error
+	ErrTypeAssertion = errors.New("type assertion error")
 )
 
 var (
@@ -164,16 +167,21 @@ func NewClient(cfg *Config) *Client {
 		log.Fatal("Pro API Key is required")
 	}
 
-	return &Client{
+	c := &Client{
 		proAPIKey: cfg.ProAPIKey,
 	}
+
+	c.common.client = c
+	c.Cryptocurrency = (*CryptocurrencyService)(&c.common)
+
+	return c
 }
 
-// CryptocurrencyInfo returns all static metadata for one or more cryptocurrencies including name, symbol, logo, and its various registered URLs.
-func (s *Client) CryptocurrencyInfo(options *CryptocurrencyInfoOptions) (map[string]*CryptocurrencyInfo, error) {
+// Info returns all static metadata for one or more cryptocurrencies including name, symbol, logo, and its various registered URLs.
+func (s *CryptocurrencyService) Info(options *InfoOptions) (map[string]*CryptocurrencyInfo, error) {
 	var params []string
 	if options == nil {
-		options = new(CryptocurrencyInfoOptions)
+		options = new(InfoOptions)
 	}
 	if options.ID != "" {
 		params = append(params, fmt.Sprintf("id=%s", options.ID))
@@ -184,7 +192,7 @@ func (s *Client) CryptocurrencyInfo(options *CryptocurrencyInfoOptions) (map[str
 
 	url := fmt.Sprintf("%s/cryptocurrency/info?%s", baseURL, strings.Join(params, "&"))
 
-	body, err := s.makeReq(url)
+	body, err := s.client.makeReq(url)
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -194,7 +202,7 @@ func (s *Client) CryptocurrencyInfo(options *CryptocurrencyInfoOptions) (map[str
 	var result = make(map[string]*CryptocurrencyInfo)
 	ifcs, ok := resp.Data.(map[string]interface{})
 	if !ok {
-		return nil, ErrCouldNotCast
+		return nil, ErrTypeAssertion
 	}
 
 	for k, v := range ifcs {
@@ -213,11 +221,11 @@ func (s *Client) CryptocurrencyInfo(options *CryptocurrencyInfoOptions) (map[str
 	return result, nil
 }
 
-// CryptocurrencyListingsLatest gets a paginated list of all cryptocurrencies with latest market data. You can configure this call to sort by market cap or another market ranking field. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
-func (s *Client) CryptocurrencyListingsLatest(options *CryptocurrencyListingsLatestOptions) ([]*Listing, error) {
+// LatestListings gets a paginated list of all cryptocurrencies with latest market data. You can configure this call to sort by market cap or another market ranking field. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
+func (s *CryptocurrencyService) LatestListings(options *ListingOptions) ([]*Listing, error) {
 	var params []string
 	if options == nil {
-		options = new(CryptocurrencyListingsLatestOptions)
+		options = new(ListingOptions)
 	}
 	if options.Start != 0 {
 		params = append(params, fmt.Sprintf("start=%v", options.Start))
@@ -234,7 +242,7 @@ func (s *Client) CryptocurrencyListingsLatest(options *CryptocurrencyListingsLat
 
 	url := fmt.Sprintf("%s/cryptocurrency/listings/latest?%s", baseURL, strings.Join(params, "&"))
 
-	body, err := s.makeReq(url)
+	body, err := s.client.makeReq(url)
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -244,7 +252,7 @@ func (s *Client) CryptocurrencyListingsLatest(options *CryptocurrencyListingsLat
 	var listings []*Listing
 	ifcs, ok := resp.Data.([]interface{})
 	if !ok {
-		return nil, ErrCouldNotCast
+		return nil, ErrTypeAssertion
 	}
 
 	for i := range ifcs {
@@ -264,11 +272,11 @@ func (s *Client) CryptocurrencyListingsLatest(options *CryptocurrencyListingsLat
 	return listings, nil
 }
 
-// CryptocurrencyQuotesLatest gets latest quote for each specified symbol. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
-func (s *Client) CryptocurrencyQuotesLatest(options *CryptocurrencyQuotesLatestOptions) ([]*QuoteLatest, error) {
+// LatestQuotes gets latest quote for each specified symbol. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
+func (s *CryptocurrencyService) LatestQuotes(options *QuoteOptions) ([]*QuoteLatest, error) {
 	var params []string
 	if options == nil {
-		options = new(CryptocurrencyQuotesLatestOptions)
+		options = new(QuoteOptions)
 	}
 
 	if options.Symbol != "" {
@@ -281,7 +289,7 @@ func (s *Client) CryptocurrencyQuotesLatest(options *CryptocurrencyQuotesLatestO
 
 	url := fmt.Sprintf("%s/cryptocurrency/quotes/latest?%s", baseURL, strings.Join(params, "&"))
 
-	body, err := s.makeReq(url)
+	body, err := s.client.makeReq(url)
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -291,7 +299,7 @@ func (s *Client) CryptocurrencyQuotesLatest(options *CryptocurrencyQuotesLatestO
 	var quotesLatest []*QuoteLatest
 	ifcs, ok := resp.Data.(interface{})
 	if !ok {
-		return nil, ErrCouldNotCast
+		return nil, ErrTypeAssertion
 	}
 
 	for _, coinObj := range ifcs.(map[string]interface{}) {

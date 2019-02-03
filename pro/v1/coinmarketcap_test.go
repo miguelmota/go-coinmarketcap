@@ -11,7 +11,7 @@ var client = NewClient(&Config{
 })
 
 func TestCryptocurrencyInfo(t *testing.T) {
-	info, err := client.CryptocurrencyInfo(&CryptocurrencyInfoOptions{
+	info, err := client.Cryptocurrency.Info(&InfoOptions{
 		Symbol: "BTC",
 	})
 	if err != nil {
@@ -23,8 +23,8 @@ func TestCryptocurrencyInfo(t *testing.T) {
 	}
 }
 
-func TestCryptocurrencyListingsLatest(t *testing.T) {
-	listings, err := client.CryptocurrencyListingsLatest(&CryptocurrencyListingsLatestOptions{
+func TestCryptocurrencyLatestListings(t *testing.T) {
+	listings, err := client.Cryptocurrency.LatestListings(&ListingOptions{
 		Limit: 1,
 	})
 	if err != nil {
@@ -38,6 +38,26 @@ func TestCryptocurrencyListingsLatest(t *testing.T) {
 		t.FailNow()
 	}
 	if listings[0].Quote["USD"].Price <= 0 {
+		t.FailNow()
+	}
+}
+
+func TestCryptocurrencyLatestQuotes(t *testing.T) {
+	quotes, err := client.Cryptocurrency.LatestQuotes(&QuoteOptions{
+		Symbol:  "BTC",
+		Convert: "CHF",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(quotes) == 0 {
+		t.FailNow()
+	}
+	if quotes[0].Name != "Bitcoin" {
+		t.FailNow()
+	}
+	if quotes[0].Quote["CHF"].Price == 0 {
 		t.FailNow()
 	}
 }

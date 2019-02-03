@@ -8,7 +8,11 @@
 
 > The latest and most up-to-date [CoinMarketCap](https://coinmarketcap.com/) API client for [Go](https://golang.org/).
 
-[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/go-coinmarketcap/master/LICENSE.md) [![Build Status](https://travis-ci.org/miguelmota/go-coinmarketcap.svg?branch=master)](https://travis-ci.org/miguelmota/go-coinmarketcap) [![Go Report Card](https://goreportcard.com/badge/github.com/miguelmota/go-coinmarketcap?)](https://goreportcard.com/report/github.com/miguelmota/go-coinmarketcap) [![GoDoc](https://godoc.org/github.com/miguelmota/go-coinmarketcap?status.svg)](https://godoc.org/github.com/miguelmota/go-coinmarketcap)
+[![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/go-coinmarketcap/master/LICENSE.md)
+[![Build Status](https://travis-ci.org/miguelmota/go-coinmarketcap.svg?branch=master)](https://travis-ci.org/miguelmota/go-coinmarketcap)
+[![Go Report Card](https://goreportcard.com/badge/github.com/miguelmota/go-coinmarketcap?)](https://goreportcard.com/report/github.com/miguelmota/go-coinmarketcap)
+[![GoDoc](https://godoc.org/github.com/miguelmota/go-coinmarketcap?status.svg)](https://godoc.org/github.com/miguelmota/go-coinmarketcap)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
 Supports the CoinMarketCap API [Pro Version](https://pro.coinmarketcap.com/api/v1), [V2](https://coinmarketcap.com/api) and V1 Public API
 
@@ -50,21 +54,21 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"os"
 
 	cmc "github.com/miguelmota/go-coinmarketcap/pro/v1"
 )
 
 func main() {
 	client := cmc.NewClient(&cmc.Config{
-		ProAPIKey: "01585d6d-123-456-789-3146576cbc70",
+		ProAPIKey: os.Getenv("CMC_PRO_API_KEY"),
 	})
 
-	listings, err := client.CryptocurrencyListingsLatest(&cmc.CryptocurrencyListingsLatestOptions{
+	listings, err := client.Cryptocurrency.LatestListings(&cmc.ListingOptions{
 		Limit: 1,
 	})
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
 
 	for _, listing := range listings {
@@ -93,7 +97,7 @@ import (
 	"fmt"
 	"log"
 
-	cmc "github.com/miguelmota/go-coinmarketcap"
+	cmc "github.com/miguelmota/go-coinmarketcap/v2"
 )
 
 func main() {
@@ -131,7 +135,7 @@ import (
 	"fmt"
 	"log"
 
-	cmc "github.com/miguelmota/go-coinmarketcap"
+	cmc "github.com/miguelmota/go-coinmarketcap/v1"
 )
 
 func main() {
@@ -153,6 +157,12 @@ func main() {
 ### Examples
 
 For more examples, check out the [`./v1/example`](./v1/example) directory and [documentation](https://godoc.org/github.com/miguelmota/go-coinmarketcap/v1)
+
+### Contributing
+
+Pull requests are welcome.
+
+Please make sure to add tests when adding new methods.
 
 ## License
 
