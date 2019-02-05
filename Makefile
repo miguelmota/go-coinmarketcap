@@ -15,3 +15,8 @@ test/pro/v1:
 
 .PHONY: test
 test: test/v1 test/v2 test/pro/v1
+
+.PHONY: release
+release:
+	@rm -rf dist
+	@goreleaser
