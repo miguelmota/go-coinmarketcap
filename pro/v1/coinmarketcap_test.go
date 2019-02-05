@@ -17,7 +17,6 @@ func TestCryptocurrencyInfo(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 	if info["BTC"].Name != "Bitcoin" {
 		t.FailNow()
 	}
@@ -31,7 +30,6 @@ func TestCryptocurrencyMap(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 	if len(listings) == 0 {
 		t.FailNow()
 	}
@@ -50,7 +48,6 @@ func TestCryptocurrencyLatestListings(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 	if len(listings) == 0 {
 		t.FailNow()
 	}
@@ -70,7 +67,6 @@ func TestCryptocurrencyLatestQuotes(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-
 	if len(quotes) == 0 {
 		t.FailNow()
 	}
@@ -85,14 +81,13 @@ func TestCryptocurrencyLatestQuotes(t *testing.T) {
 func TestToolsPriceConversion(t *testing.T) {
 	t.Skip("requires paid plan for api")
 	listing, err := client.Tools.PriceConversion(&ConvertOptions{
-		Amount:  10000000,
+		Amount:  100,
 		Symbol:  "BTC",
 		Convert: "USD",
 	})
 	if err != nil {
 		t.Error(err)
 	}
-
 	if listing.Quote["USD"].Price <= 0 {
 		t.FailNow()
 	}
