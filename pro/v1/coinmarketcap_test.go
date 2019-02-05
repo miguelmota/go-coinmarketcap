@@ -23,6 +23,26 @@ func TestCryptocurrencyInfo(t *testing.T) {
 	}
 }
 
+func TestCryptocurrencyMap(t *testing.T) {
+	listings, err := client.Cryptocurrency.Map(&MapOptions{
+		ListingStatus: "active",
+		Limit:         1,
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(listings) == 0 {
+		t.FailNow()
+	}
+	if listings[0].Name != "Bitcoin" {
+		t.FailNow()
+	}
+	if listings[0].IsActive != 1 {
+		t.FailNow()
+	}
+}
+
 func TestCryptocurrencyLatestListings(t *testing.T) {
 	listings, err := client.Cryptocurrency.LatestListings(&ListingOptions{
 		Limit: 1,

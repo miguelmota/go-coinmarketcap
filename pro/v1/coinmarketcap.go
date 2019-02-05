@@ -56,6 +56,18 @@ type Listing struct {
 	Quote             map[string]*Quote `json:"quote"`
 }
 
+// MapListing is the structure of a map listing
+type MapListing struct {
+	ID                  float64 `json:"id"`
+	Name                string  `json:"name"`
+	Symbol              string  `json:"symbol"`
+	Slug                string  `json:"slug"`
+	IsActive            int     `json:"is_active"`
+	FirstHistoricalData string  `json:"first_historical_data"`
+	LastHistoricalData  string  `json:"last_historical_data"`
+	Platform            *string
+}
+
 // QuoteLatest is the quotes structure
 type QuoteLatest struct {
 	ID                float64           `json:"id"`
@@ -107,6 +119,14 @@ type ListingOptions struct {
 	Limit   int
 	Convert string
 	Sort    string
+}
+
+// MapOptions options
+type MapOptions struct {
+	ListingStatus string
+	Start         int
+	Limit         int
+	Symbol        string
 }
 
 // QuoteOptions options
@@ -270,6 +290,62 @@ func (s *CryptocurrencyService) LatestListings(options *ListingOptions) ([]*List
 	}
 
 	return listings, nil
+}
+
+// Map returns a paginated list of all cryptocurrencies by CoinMarketCap ID.
+func (s *CryptocurrencyService) Map(options *MapOptions) ([]*MapListing, error) {
+	var params []string
+	if options == nil {
+		options = new(MapOptions)
+	}
+
+	if options.ListingStatus != "" {
+		params = append(params, fmt.Sprintf("listing_status=%s", options.ListingStatus))
+	}
+
+	if options.Start != 0 {
+		params = append(params, fmt.Sprintf("start=%d", options.Start))
+	}
+
+	if options.Limit != 0 {
+		params = append(params, fmt.Sprintf("limit=%d", options.Limit))
+	}
+
+	if options.Symbol != "" {
+		params = append(params, fmt.Sprintf("symbol=%s", options.Symbol))
+	}
+
+	url := fmt.Sprintf("%s/cryptocurrency/map?%s", baseURL, strings.Join(params, "&"))
+
+	body, err := s.client.makeReq(url)
+	resp := new(Response)
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
+	}
+
+	var result []*MapListing
+	ifcs, ok := resp.Data.(interface{})
+	if !ok {
+		return nil, ErrTypeAssertion
+	}
+
+	for _, item := range ifcs.([]interface{}) {
+		value := new(MapListing)
+		b, err := json.Marshal(item)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(b, value)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, value)
+	}
+
+	return result, nil
 }
 
 // LatestQuotes gets latest quote for each specified symbol. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
