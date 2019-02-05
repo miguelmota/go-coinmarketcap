@@ -157,6 +157,16 @@ type QuoteOptions struct {
 	Symbol string
 }
 
+// ConvertOptions options
+type ConvertOptions struct {
+	Amount  float64
+	ID      string
+	Symbol  string
+	Time    int
+	Convert string
+}
+
+// service is abstraction for individual endpoint resources
 type service struct {
 	client *Client
 }
@@ -414,15 +424,6 @@ func (s *CryptocurrencyService) LatestQuotes(options *QuoteOptions) ([]*QuoteLat
 		quotesLatest = append(quotesLatest, quoteLatest)
 	}
 	return quotesLatest, nil
-}
-
-// ConvertOptions options
-type ConvertOptions struct {
-	Amount  float64
-	ID      string
-	Symbol  string
-	Time    int
-	Convert string
 }
 
 // PriceConversion Convert an amount of one currency into multiple cryptocurrencies or fiat currencies at the same time using the latest market averages. Optionally pass a historical timestamp to convert values based on historic averages.
