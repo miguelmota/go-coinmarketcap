@@ -82,6 +82,22 @@ func TestCryptocurrencyLatestQuotes(t *testing.T) {
 	}
 }
 
+func TestToolsPriceConversion(t *testing.T) {
+	t.Skip("requires paid plan for api")
+	listing, err := client.Tools.PriceConversion(&ConvertOptions{
+		Amount:  10000000,
+		Symbol:  "BTC",
+		Convert: "USD",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+
+	if listing.Quote["USD"].Price <= 0 {
+		t.FailNow()
+	}
+}
+
 func TestSortOptions(t *testing.T) {
 	if SortOptions.MarketCap != "market_cap" {
 		t.FailNow()

@@ -14,6 +14,7 @@ import (
 type Client struct {
 	proAPIKey      string
 	Cryptocurrency *CryptocurrencyService
+	Tools          *ToolsService
 	common         service
 }
 
@@ -24,6 +25,9 @@ type Config struct {
 
 // CryptocurrencyService ...
 type CryptocurrencyService service
+
+// ToolsService ...
+type ToolsService service
 
 // Status is the status structure
 type Status struct {
@@ -66,6 +70,22 @@ type MapListing struct {
 	FirstHistoricalData string  `json:"first_historical_data"`
 	LastHistoricalData  string  `json:"last_historical_data"`
 	Platform            *string
+}
+
+// ConvertListing is the converted listing structure
+type ConvertListing struct {
+	ID          string                   `json:"id"`
+	Name        string                   `json:"name"`
+	Symbol      string                   `json:"symbol"`
+	Amount      float64                  `json:"amount"`
+	LastUpdated string                   `json:"last_updated"`
+	Quote       map[string]*ConvertQuote `json:"quote"`
+}
+
+// ConvertQuote is the converted listing structure
+type ConvertQuote struct {
+	Price       float64 `json:"price"`
+	LastUpdated string  `json:"last_updated"`
 }
 
 // QuoteLatest is the quotes structure
@@ -193,6 +213,7 @@ func NewClient(cfg *Config) *Client {
 
 	c.common.client = c
 	c.Cryptocurrency = (*CryptocurrencyService)(&c.common)
+	c.Tools = (*ToolsService)(&c.common)
 
 	return c
 }
@@ -393,6 +414,71 @@ func (s *CryptocurrencyService) LatestQuotes(options *QuoteOptions) ([]*QuoteLat
 		quotesLatest = append(quotesLatest, quoteLatest)
 	}
 	return quotesLatest, nil
+}
+
+// ConvertOptions options
+type ConvertOptions struct {
+	Amount  float64
+	ID      string
+	Symbol  string
+	Time    int
+	Convert string
+}
+
+// PriceConversion Convert an amount of one currency into multiple cryptocurrencies or fiat currencies at the same time using the latest market averages. Optionally pass a historical timestamp to convert values based on historic averages.
+func (s *ToolsService) PriceConversion(options *ConvertOptions) (*ConvertListing, error) {
+	var params []string
+	if options == nil {
+		options = new(ConvertOptions)
+	}
+
+	if options.Amount != 0 {
+		params = append(params, fmt.Sprintf("amount=%f", options.Amount))
+	}
+
+	if options.ID != "" {
+		params = append(params, fmt.Sprintf("id=%s", options.ID))
+	}
+
+	if options.Symbol != "" {
+		params = append(params, fmt.Sprintf("symbol=%s", options.Symbol))
+	}
+
+	if options.Time != 0 {
+		params = append(params, fmt.Sprintf("time=%d", options.Time))
+	}
+
+	if options.Convert != "" {
+		params = append(params, fmt.Sprintf("convert=%s", options.Convert))
+	}
+
+	url := fmt.Sprintf("%s/tools/price-conversion?%s", baseURL, strings.Join(params, "&"))
+
+	body, err := s.client.makeReq(url)
+
+	resp := new(Response)
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
+	}
+
+	ifc, ok := resp.Data.(interface{})
+	if !ok {
+		return nil, ErrTypeAssertion
+	}
+
+	listing := new(ConvertListing)
+	b, err := json.Marshal(ifc)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(b, listing)
+	if err != nil {
+		return nil, err
+	}
+
+	return listing, nil
 }
 
 func init() {
