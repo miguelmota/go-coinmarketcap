@@ -1,8 +1,4 @@
 builds:
   - binary: coinmarketcap
     goos:
-      - windows
-      - darwin
-      - linux
     goarch:
-      - amd64
