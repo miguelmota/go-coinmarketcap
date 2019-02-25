@@ -14,6 +14,8 @@ import (
 type Client struct {
 	proAPIKey      string
 	Cryptocurrency *CryptocurrencyService
+	Exchange       *ExchangeService
+	GlobalMetrics  *GlobalMetricsService
 	Tools          *ToolsService
 	common         service
 }
@@ -25,6 +27,12 @@ type Config struct {
 
 // CryptocurrencyService ...
 type CryptocurrencyService service
+
+// ExchangeService ...
+type ExchangeService service
+
+// GlobalMetricsService ...
+type GlobalMetricsService service
 
 // ToolsService ...
 type ToolsService service
@@ -223,6 +231,8 @@ func NewClient(cfg *Config) *Client {
 
 	c.common.client = c
 	c.Cryptocurrency = (*CryptocurrencyService)(&c.common)
+	c.Exchange = (*ExchangeService)(&c.common)
+	c.GlobalMetrics = (*GlobalMetricsService)(&c.common)
 	c.Tools = (*ToolsService)(&c.common)
 
 	return c
@@ -379,6 +389,58 @@ func (s *CryptocurrencyService) Map(options *MapOptions) ([]*MapListing, error) 
 	return result, nil
 }
 
+// LatestMarketPairs Lists all market pairs across all exchanges for the specified cryptocurrency with associated stats. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
+func (s *CryptocurrencyService) LatestMarketPairs(options *QuoteOptions) ([]*QuoteLatest, error) {
+	var params []string
+	if options == nil {
+		options = new(QuoteOptions)
+	}
+
+	if options.Symbol != "" {
+		params = append(params, fmt.Sprintf("symbol=%s", options.Symbol))
+	}
+
+	if options.Convert != "" {
+		params = append(params, fmt.Sprintf("convert=%s", options.Convert))
+	}
+
+	url := fmt.Sprintf("%s/cryptocurrency/quotes/latest?%s", baseURL, strings.Join(params, "&"))
+
+	body, err := s.client.makeReq(url)
+	resp := new(Response)
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
+	}
+
+	var quotesLatest []*QuoteLatest
+	ifcs, ok := resp.Data.(interface{})
+	if !ok {
+		return nil, ErrTypeAssertion
+	}
+
+	for _, coinObj := range ifcs.(map[string]interface{}) {
+		quoteLatest := new(QuoteLatest)
+		b, err := json.Marshal(coinObj)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(b, quoteLatest)
+		if err != nil {
+			return nil, err
+		}
+
+		quotesLatest = append(quotesLatest, quoteLatest)
+	}
+	return quotesLatest, nil
+}
+
+// HistoricalOHLCV NOT IMPLEMENTED
+func (s *CryptocurrencyService) HistoricalOHLCV() error {
+	return nil
+}
+
 // LatestQuotes gets latest quote for each specified symbol. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
 func (s *CryptocurrencyService) LatestQuotes(options *QuoteOptions) ([]*QuoteLatest, error) {
 	var params []string
@@ -424,6 +486,51 @@ func (s *CryptocurrencyService) LatestQuotes(options *QuoteOptions) ([]*QuoteLat
 		quotesLatest = append(quotesLatest, quoteLatest)
 	}
 	return quotesLatest, nil
+}
+
+// HistoricalQuotes NOT IMPLEMENTED
+func (s *CryptocurrencyService) HistoricalQuotes() error {
+	return nil
+}
+
+// Info NOT IMPLEMENTED
+func (s *ExchangeService) Info() error {
+	return nil
+}
+
+// Map NOT IMPLEMENTED
+func (s *ExchangeService) Map() error {
+	return nil
+}
+
+// LatestListings NOT IMPLEMENTED
+func (s *ExchangeService) LatestListings() error {
+	return nil
+}
+
+// LatestMarketPairs NOT IMPLEMENTED
+func (s *ExchangeService) LatestMarketPairs() error {
+	return nil
+}
+
+// LatestQuotes NOT IMPLEMENTED
+func (s *ExchangeService) LatestQuotes() error {
+	return nil
+}
+
+// HistoricalQuotes NOT IMPLEMENTED
+func (s *ExchangeService) HistoricalQuotes() error {
+	return nil
+}
+
+// LatestQuotes NOT IMPLEMENTED
+func (s *GlobalMetricsService) LatestQuotes() error {
+	return nil
+}
+
+// HistoricalQuotes NOT IMPLEMENTED
+func (s *GlobalMetricsService) HistoricalQuotes() error {
+	return nil
 }
 
 // PriceConversion Convert an amount of one currency into multiple cryptocurrencies or fiat currencies at the same time using the latest market averages. Optionally pass a historical timestamp to convert values based on historic averages.
