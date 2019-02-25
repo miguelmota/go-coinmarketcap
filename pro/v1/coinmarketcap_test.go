@@ -59,6 +59,33 @@ func TestCryptocurrencyLatestListings(t *testing.T) {
 	}
 }
 
+func TestCryptocurrencyLatestMarketPairs(t *testing.T) {
+	t.Skip("requires paid plan for api")
+
+	info, err := client.Cryptocurrency.LatestMarketPairs(&MarketPairOptions{
+		Symbol: "BTC",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	if info.Name != "Bitcoin" {
+		t.FailNow()
+	}
+	if len(info.MarketPairs) == 0 {
+		t.FailNow()
+	}
+	if info.MarketPairs[0].Quote["USD"].Price == 0 {
+		t.FailNow()
+	}
+	if info.MarketPairs[0].ExchangeReported.Price == 0 {
+		t.FailNow()
+	}
+}
+
+func TestCryptocurrencyHistoricalOHLCV(t *testing.T) {
+	// TODO
+}
+
 func TestCryptocurrencyLatestQuotes(t *testing.T) {
 	quotes, err := client.Cryptocurrency.LatestQuotes(&QuoteOptions{
 		Symbol:  "BTC",
@@ -76,6 +103,42 @@ func TestCryptocurrencyLatestQuotes(t *testing.T) {
 	if quotes[0].Quote["CHF"].Price == 0 {
 		t.FailNow()
 	}
+}
+
+func TestCryptocurrencyHistoricalQuotes(t *testing.T) {
+	// TODO
+}
+
+func TestExchangeInfo(t *testing.T) {
+	// TODO
+}
+
+func TestExchangeMap(t *testing.T) {
+	// TODO
+}
+
+func TestExchangeLatestListings(t *testing.T) {
+	// TODO
+}
+
+func TestExchangeLatestMarketPairs(t *testing.T) {
+	// TODO
+}
+
+func TestExchangeLatestQuotes(t *testing.T) {
+	// TODO
+}
+
+func TestExchangeHistoricalQuotes(t *testing.T) {
+	// TODO
+}
+
+func TestGlobalMetricsLatestQuotes(t *testing.T) {
+	// TODO
+}
+
+func TestGlobalMetricsHistoricalQuotes(t *testing.T) {
+	// TODO
 }
 
 func TestToolsPriceConversion(t *testing.T) {

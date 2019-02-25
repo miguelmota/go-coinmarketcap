@@ -33,7 +33,7 @@ go get -u github.com/miguelmota/go-coinmarketcap
 | Cryptocurrency | /v1/cryptocurrency/info                | ✓            |
 | Cryptocurrency | /v1/cryptocurrency/map                 | ✓            |
 | Cryptocurrency | /v1/cryptocurrency/listings/latest     | ✓            |
-| Cryptocurrency | /v1/cryptocurrency/market-pairs/latest | -            |
+| Cryptocurrency | /v1/cryptocurrency/market-pairs/latest | ✓            |
 | Cryptocurrency | /v1/cryptocurrency/ohlcv/historical    | -            |
 | Cryptocurrency | /v1/cryptocurrency/quotes/latest       | ✓            |
 | Cryptocurrency | /v1/cryptocurrency/quotes/historical   | -            |
@@ -46,6 +46,8 @@ go get -u github.com/miguelmota/go-coinmarketcap
 | Global Metrics | /v1/global-metrics/quotes/latest       | -            |
 | Global Metrics | /v1/global-metrics/quotes/historical   | -            |
 | Tools          | /v1/tools/price-conversion             | ✓            |
+
+Note: some endpoints require a paid plan.
 
 ### Getting started
 

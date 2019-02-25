@@ -174,6 +174,15 @@ type ConvertOptions struct {
 	Convert string
 }
 
+// MarketPairOptions options
+type MarketPairOptions struct {
+	ID      int
+	Symbol  string
+	Start   int
+	Limit   int
+	Convert string
+}
+
 // service is abstraction for individual endpoint resources
 type service struct {
 	client *Client
@@ -389,51 +398,134 @@ func (s *CryptocurrencyService) Map(options *MapOptions) ([]*MapListing, error) 
 	return result, nil
 }
 
+// Exchange ...
+type Exchange struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+// MarketPairBase ...
+type MarketPairBase struct {
+	CurrencyID     int    `json:"currency_id"`
+	CurrencySymbol string `json:"currency_symbol"`
+	CurrencyType   string `json:"currency_type"`
+}
+
+// MarketPairQuote ...
+type MarketPairQuote struct {
+	CurrencyID     int    `json:"currency_id"`
+	CurrencySymbol string `json:"currency_symbol"`
+	CurrencyType   string `json:"currency_type"`
+}
+
+// ExchangeQuote ...
+type ExchangeQuote struct {
+	Price          float64 `json:"price"`
+	Volume24       float64 `json:"volume_24h"`
+	Volume24HBase  float64 `json:"volume_24h_base"`  // for 'exchange_reported'
+	Volume24HQuote float64 `json:"volume_24h_quote"` // for 'exchange_reported'
+	LastUpdated    string  `json:"last_updated"`
+}
+
+// ExchangeQuotes ...
+type ExchangeQuotes map[string]*ExchangeQuote
+
+// ExchangeReported ...
+type ExchangeReported struct {
+	Price          float64 `json:"price"`
+	Volume24HBase  float64 `json:"volume_24h_base"`
+	Volume24HQuote float64 `json:"volume_24h_quote"`
+	LastUpdated    string  `json:"last_updated"`
+}
+
+// MarketPairs ...
+type MarketPairs struct {
+	ID             int           `json:"id"`
+	Name           string        `json:"name"`
+	Symbol         string        `json:"symbol"`
+	NumMarketPairs int           `json:"num_market_pairs"`
+	MarketPairs    []*MarketPair `json:"market_pairs"`
+}
+
+// MarketPair ...
+type MarketPair struct {
+	Exchange         *Exchange
+	MarketPair       string            `json:"market_pair"`
+	MarketPairBase   *MarketPairBase   `json:"market_pair_base"`
+	MarketPairQuote  *MarketPairQuote  `json:"market_pair_quote"`
+	Quote            ExchangeQuotes    `json:"quote"`
+	ExchangeReported *ExchangeReported `json:"exchange_reported"`
+}
+
 // LatestMarketPairs Lists all market pairs across all exchanges for the specified cryptocurrency with associated stats. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
-func (s *CryptocurrencyService) LatestMarketPairs(options *QuoteOptions) ([]*QuoteLatest, error) {
+func (s *CryptocurrencyService) LatestMarketPairs(options *MarketPairOptions) (*MarketPairs, error) {
 	var params []string
 	if options == nil {
-		options = new(QuoteOptions)
+		options = new(MarketPairOptions)
+	}
+
+	if options.ID != 0 {
+		params = append(params, fmt.Sprintf("id=%v", options.ID))
 	}
 
 	if options.Symbol != "" {
 		params = append(params, fmt.Sprintf("symbol=%s", options.Symbol))
 	}
 
+	if options.Start != 0 {
+		params = append(params, fmt.Sprintf("start=%v", options.Start))
+	}
+
+	if options.Limit != 0 {
+		params = append(params, fmt.Sprintf("limit=%v", options.Limit))
+	}
+
 	if options.Convert != "" {
 		params = append(params, fmt.Sprintf("convert=%s", options.Convert))
 	}
 
-	url := fmt.Sprintf("%s/cryptocurrency/quotes/latest?%s", baseURL, strings.Join(params, "&"))
+	url := fmt.Sprintf("%s/cryptocurrency/market-pairs/latest?%s", baseURL, strings.Join(params, "&"))
 
 	body, err := s.client.makeReq(url)
 	resp := new(Response)
+
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
 		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
 	}
 
-	var quotesLatest []*QuoteLatest
-	ifcs, ok := resp.Data.(interface{})
+	data, ok := resp.Data.(interface{})
 	if !ok {
 		return nil, ErrTypeAssertion
 	}
 
-	for _, coinObj := range ifcs.(map[string]interface{}) {
-		quoteLatest := new(QuoteLatest)
-		b, err := json.Marshal(coinObj)
-		if err != nil {
-			return nil, err
-		}
-
-		err = json.Unmarshal(b, quoteLatest)
-		if err != nil {
-			return nil, err
-		}
-
-		quotesLatest = append(quotesLatest, quoteLatest)
+	marketPairs := new(MarketPairs)
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
 	}
-	return quotesLatest, nil
+
+	err = json.Unmarshal(b, marketPairs)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, pair := range marketPairs.MarketPairs {
+		reported, ok := pair.Quote["exchange_reported"]
+		if ok {
+			pair.ExchangeReported = &ExchangeReported{
+				Price:          reported.Price,
+				Volume24HBase:  reported.Volume24HBase,
+				Volume24HQuote: reported.Volume24HQuote,
+				LastUpdated:    reported.LastUpdated,
+			}
+
+			delete(pair.Quote, "exchange_reported")
+		}
+	}
+
+	return marketPairs, nil
 }
 
 // HistoricalOHLCV NOT IMPLEMENTED
