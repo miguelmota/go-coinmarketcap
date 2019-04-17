@@ -123,6 +123,24 @@ type Quote struct {
 	LastUpdated      string  `json:"last_updated"`
 }
 
+// MarketMetrics is the market metrics structure
+type MarketMetrics struct {
+	BTCDominance           float64                        `json:"btc_dominance"`
+	ETHDominance           float64                        `json:"eth_dominance"`
+	ActiveCryptocurrencies float64                        `json:"active_cryptocurrencies"`
+	ActiveMarketPairs      float64                        `json:"active_market_pairs"`
+	ActiveExchanges        float64                        `json:"active_exchanges"`
+	LastUpdated            string                         `json:"last_updated"`
+	Quote                  map[string]*MarketMetricsQuote `json:"quote"`
+}
+
+// MarketMetricsQuote is the quote structure
+type MarketMetricsQuote struct {
+	TotalMarketCap float64 `json:"total_market_cap"`
+	TotalVolume24H float64 `json:"total_volume_24h"`
+	LastUpdated    string  `json:"last_updated"`
+}
+
 // CryptocurrencyInfo options
 type CryptocurrencyInfo struct {
 	ID       float64                `json:"id"`
@@ -615,9 +633,71 @@ func (s *ExchangeService) HistoricalQuotes() error {
 	return nil
 }
 
-// LatestQuotes NOT IMPLEMENTED
-func (s *GlobalMetricsService) LatestQuotes() error {
-	return nil
+/*
+{
+"data": {
+	"btc_dominance": 55.5,
+	"eth_dominance": 10.1,
+	"active_cryptocurrencies": 2500,
+	"active_market_pairs": 9910,
+	"active_exchanges": 600,
+	"last_updated": 1522523367,
+	"quote": {
+		"USD": {
+			"total_market_cap": 375179000000,
+			"total_volume_24h": 19918400000,
+			"last_updated": "2018-08-09T23:02:00.000Z"
+		}
+	}
+	},
+	"status": {
+		"timestamp": "2018-06-02T22:51:28.209Z",
+		"error_code": 0,
+		"error_message": "",
+		"elapsed": 10,
+		"credit_count": 1
+	}
+}
+*/
+
+// LatestQuotes Get the latest quote of aggregate market metrics. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
+func (s *GlobalMetricsService) LatestQuotes(options *QuoteOptions) (*MarketMetrics, error) {
+	var params []string
+	if options == nil {
+		options = new(QuoteOptions)
+	}
+
+	if options.Convert != "" {
+		params = append(params, fmt.Sprintf("convert=%s", options.Convert))
+	}
+
+	url := fmt.Sprintf("%s/global-metrics/quotes/latest?%s", baseURL, strings.Join(params, "&"))
+
+	body, err := s.client.makeReq(url)
+	resp := new(Response)
+
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
+	}
+
+	data, ok := resp.Data.(interface{})
+	if !ok {
+		return nil, ErrTypeAssertion
+	}
+
+	marketMetrics := new(MarketMetrics)
+	b, err := json.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
+
+	err = json.Unmarshal(b, marketMetrics)
+	if err != nil {
+		return nil, err
+	}
+
+	return marketMetrics, nil
 }
 
 // HistoricalQuotes NOT IMPLEMENTED

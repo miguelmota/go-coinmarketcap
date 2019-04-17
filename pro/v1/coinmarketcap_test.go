@@ -134,7 +134,18 @@ func TestExchangeHistoricalQuotes(t *testing.T) {
 }
 
 func TestGlobalMetricsLatestQuotes(t *testing.T) {
-	// TODO
+	metrics, err := client.GlobalMetrics.LatestQuotes(&QuoteOptions{
+		Convert: "USD",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	if metrics.BTCDominance <= 0 {
+		t.FailNow()
+	}
+	if metrics.Quote["USD"].TotalMarketCap <= 0 {
+		t.FailNow()
+	}
 }
 
 func TestGlobalMetricsHistoricalQuotes(t *testing.T) {

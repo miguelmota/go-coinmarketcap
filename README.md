@@ -43,7 +43,7 @@ go get -u github.com/miguelmota/go-coinmarketcap
 | Exchange       | /v1/exchange/market-pairs/latest       | -            |
 | Exchange       | /v1/exchange/quotes/latest             | -            |
 | Exchange       | /v1/exchange/quotes/historical         | -            |
-| Global Metrics | /v1/global-metrics/quotes/latest       | -            |
+| Global Metrics | /v1/global-metrics/quotes/latest       | ✓            |
 | Global Metrics | /v1/global-metrics/quotes/historical   | -            |
 | Tools          | /v1/tools/price-conversion             | ✓            |
 
