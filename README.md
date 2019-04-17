@@ -166,6 +166,24 @@ Pull requests are welcome.
 
 Please make sure to add tests when adding new methods.
 
+## Development
+
+Test
+
+```bash
+make test
+```
+
+Release
+
+```bash
+git tag v0.1.x
+```
+
+```bash
+make release
+```
+
 ## License
 
 MIT
