@@ -633,33 +633,6 @@ func (s *ExchangeService) HistoricalQuotes() error {
 	return nil
 }
 
-/*
-{
-"data": {
-	"btc_dominance": 55.5,
-	"eth_dominance": 10.1,
-	"active_cryptocurrencies": 2500,
-	"active_market_pairs": 9910,
-	"active_exchanges": 600,
-	"last_updated": 1522523367,
-	"quote": {
-		"USD": {
-			"total_market_cap": 375179000000,
-			"total_volume_24h": 19918400000,
-			"last_updated": "2018-08-09T23:02:00.000Z"
-		}
-	}
-	},
-	"status": {
-		"timestamp": "2018-06-02T22:51:28.209Z",
-		"error_code": 0,
-		"error_message": "",
-		"elapsed": 10,
-		"credit_count": 1
-	}
-}
-*/
-
 // LatestQuotes Get the latest quote of aggregate market metrics. Use the "convert" option to return market values in multiple fiat and cryptocurrency conversions in the same call.
 func (s *GlobalMetricsService) LatestQuotes(options *QuoteOptions) (*MarketMetrics, error) {
 	var params []string
