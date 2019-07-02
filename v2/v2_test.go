@@ -213,6 +213,28 @@ func TestMarkets(t *testing.T) {
 	}
 }
 
+func TestCoinSlug(t *testing.T) {
+	slug, err := CoinSlug("btc")
+	if err != nil {
+		t.FailNow()
+	}
+
+	if slug != "bitcoin" {
+		t.FailNow()
+	}
+}
+
+func TestCoinSymbol(t *testing.T) {
+	symbol, err := CoinSymbol("bitcoin")
+	if err != nil {
+		t.FailNow()
+	}
+
+	if symbol != "BTC" {
+		t.FailNow()
+	}
+}
+
 func TestPrice(t *testing.T) {
 	price, err := Price(&PriceOptions{
 		Symbol:  "ETH",
