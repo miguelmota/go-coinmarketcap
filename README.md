@@ -30,22 +30,22 @@ go get -u github.com/miguelmota/go-coinmarketcap
 
 | Type           | Endpoint                               | Implemented? |
 |----------------|----------------------------------------|--------------|
-| Cryptocurrency | /v1/cryptocurrency/info                | ✓            |
-| Cryptocurrency | /v1/cryptocurrency/map                 | ✓            |
-| Cryptocurrency | /v1/cryptocurrency/listings/latest     | ✓            |
-| Cryptocurrency | /v1/cryptocurrency/market-pairs/latest | ✓            |
-| Cryptocurrency | /v1/cryptocurrency/ohlcv/historical    | -            |
-| Cryptocurrency | /v1/cryptocurrency/quotes/latest       | ✓            |
-| Cryptocurrency | /v1/cryptocurrency/quotes/historical   | -            |
-| Exchange       | /v1/exchange/info                      | -            |
-| Exchange       | /v1/exchange/map                       | -            |
-| Exchange       | /v1/exchange/listings/latest           | -            |
-| Exchange       | /v1/exchange/market-pairs/latest       | -            |
-| Exchange       | /v1/exchange/quotes/latest             | -            |
-| Exchange       | /v1/exchange/quotes/historical         | -            |
-| Global Metrics | /v1/global-metrics/quotes/latest       | ✓            |
-| Global Metrics | /v1/global-metrics/quotes/historical   | -            |
-| Tools          | /v1/tools/price-conversion             | ✓            |
+| Cryptocurrency | [/v1/cryptocurrency/info](https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyInfo)                              | ✓            |
+| Cryptocurrency | [/v1/cryptocurrency/map](https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyMap)                                | ✓            |
+| Cryptocurrency | [/v1/cryptocurrency/listings/latest](https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyListingsLatest)         | ✓            |
+| Cryptocurrency | [/v1/cryptocurrency/market-pairs/latest](https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyMarketpairsLatest)  | ✓            |
+| Cryptocurrency | [/v1/cryptocurrency/ohlcv/historical](https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyOhlcvHistorical)       | -            |
+| Cryptocurrency | [/v1/cryptocurrency/quotes/latest](https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyQuotesLatest)             | ✓            |
+| Cryptocurrency | [/v1/cryptocurrency/quotes/historical](https://coinmarketcap.com/api/documentation/v1/#operation/getV1CryptocurrencyQuotesHistorical)     | -            |
+| Exchange       | [/v1/exchange/info](https://coinmarketcap.com/api/documentation/v1/#operation/getV1ExchangeInfo)                                          | -            |
+| Exchange       | [/v1/exchange/map](https://coinmarketcap.com/api/documentation/v1/#operation/getV1ExchangeMap)                                            | -            |
+| Exchange       | [/v1/exchange/listings/latest](https://coinmarketcap.com/api/documentation/v1/#operation/getV1ExchangeListingsLatest)                     | -            |
+| Exchange       | [/v1/exchange/market-pairs/latest](https://coinmarketcap.com/api/documentation/v1/#operation/getV1ExchangeMarketpairsLatest)              | -            |
+| Exchange       | [/v1/exchange/quotes/latest](https://coinmarketcap.com/api/documentation/v1/#operation/getV1ExchangeQuotesLatest)                         | -            |
+| Exchange       | [/v1/exchange/quotes/historical](https://coinmarketcap.com/api/documentation/v1/#operation/getV1ExchangeQuotesHistorical)                 | -            |
+| Global Metrics | [/v1/global-metrics/quotes/latest](https://coinmarketcap.com/api/documentation/v1/#operation/getV1GlobalmetricsQuotesLatest)              | ✓            |
+| Global Metrics | [/v1/global-metrics/quotes/historical](https://coinmarketcap.com/api/documentation/v1/#operation/getV1GlobalmetricsQuotesHistorical)      | -            |
+| Tools          | [/v1/tools/price-conversion](https://coinmarketcap.com/api/documentation/v1/#operation/getV1ToolsPriceconversion)                         | ✓            |
 
 Note: some endpoints require a paid plan.
 
