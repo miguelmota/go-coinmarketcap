@@ -6,7 +6,7 @@
   <br />
 </h1>
 
-> The latest and most up-to-date [CoinMarketCap](https://coinmarketcap.com/) API client for [Go](https://golang.org/).
+> The unofficial [CoinMarketCap](https://coinmarketcap.com/) API client for [Go](https://golang.org/).
 
 [![License](http://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/miguelmota/go-coinmarketcap/master/LICENSE.md)
 [![Build Status](https://travis-ci.org/miguelmota/go-coinmarketcap.svg?branch=master)](https://travis-ci.org/miguelmota/go-coinmarketcap)
@@ -15,6 +15,16 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
 Supports the CoinMarketCap API [Pro Version](https://pro.coinmarketcap.com/api/v1), [V2](https://coinmarketcap.com/api) and V1 Public API
+
+## Contents
+
+- [Documentation](#Documentation)
+- [Install](#Install)
+- [Getting Started](#Getting-Started)
+- [Examples](#Examples)
+- [Contributing](#Contributing)
+- [Development](#Development)
+- [License](#License)
 
 ## Documentation
 
