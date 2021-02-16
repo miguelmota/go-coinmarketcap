@@ -22,6 +22,23 @@ func TestCryptocurrencyInfo(t *testing.T) {
 	}
 }
 
+func TestCryptocurrencyInfoName(t *testing.T) {
+	info, err := client.Cryptocurrency.Info(&InfoOptions{
+		Slug: "bitcoin",
+	})
+	if err != nil {
+		t.Error(err)
+	}
+	if len(info) == 0 {
+		t.FailNow()
+	}
+	for k := range info {
+		if info[k].Name != "Bitcoin" {
+			t.FailNow()
+		}
+	}
+}
+
 func TestCryptocurrencyMap(t *testing.T) {
 	listings, err := client.Cryptocurrency.Map(&MapOptions{
 		ListingStatus: "active",
