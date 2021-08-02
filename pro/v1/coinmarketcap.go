@@ -204,11 +204,12 @@ type QuoteOptions struct {
 
 // ConvertOptions options
 type ConvertOptions struct {
-	Amount  float64
-	ID      string
-	Symbol  string
-	Time    int
-	Convert string
+	Amount    float64
+	ID        string
+	Symbol    string
+	Time      int
+	Convert   string
+	ConvertID string
 }
 
 // MarketPairOptions options
@@ -773,6 +774,8 @@ func (s *ToolsService) PriceConversion(options *ConvertOptions) (*ConvertListing
 
 	if options.Convert != "" {
 		params = append(params, fmt.Sprintf("convert=%s", options.Convert))
+	} else if options.ConvertID != "" {
+		params = append(params, fmt.Sprintf("convert_id=%s", options.ConvertID))
 	}
 
 	url := fmt.Sprintf("%s/tools/price-conversion?%s", baseURL, strings.Join(params, "&"))
