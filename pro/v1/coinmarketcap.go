@@ -13,6 +13,7 @@ import (
 type Client struct {
 	proAPIKey      string
 	Cryptocurrency *CryptocurrencyService
+	Fiat           *FiatService
 	Exchange       *ExchangeService
 	GlobalMetrics  *GlobalMetricsService
 	Tools          *ToolsService
@@ -26,6 +27,9 @@ type Config struct {
 
 // CryptocurrencyService ...
 type CryptocurrencyService service
+
+// FiatService ...
+type FiatService service
 
 // ExchangeService ...
 type ExchangeService service
@@ -77,6 +81,14 @@ type MapListing struct {
 	FirstHistoricalData string  `json:"first_historical_data"`
 	LastHistoricalData  string  `json:"last_historical_data"`
 	Platform            *string
+}
+
+// FiatMapListing is the structure of a fiat map listing
+type FiatMapListing struct {
+	ID     float64 `json:"id"`
+	Name   string  `json:"name"`
+	Sign   string  `json:"sign"`
+	Symbol string  `json:"symbol"`
 }
 
 // ConvertListing is the converted listing structure
@@ -173,6 +185,13 @@ type MapOptions struct {
 	Start         int
 	Limit         int
 	Symbol        string
+}
+
+// FiatMapOptions options
+type FiatMapOptions struct {
+	Start         int
+	Limit         int
+	IncludeMetals bool
 }
 
 // QuoteOptions options
@@ -399,6 +418,58 @@ func (s *CryptocurrencyService) Map(options *MapOptions) ([]*MapListing, error) 
 
 	for _, item := range ifcs.([]interface{}) {
 		value := new(MapListing)
+		b, err := json.Marshal(item)
+		if err != nil {
+			return nil, err
+		}
+
+		err = json.Unmarshal(b, value)
+		if err != nil {
+			return nil, err
+		}
+
+		result = append(result, value)
+	}
+
+	return result, nil
+}
+
+// Map returns a paginated list of all cryptocurrencies by CoinMarketCap ID.
+func (s *FiatService) Map(options *FiatMapOptions) ([]*FiatMapListing, error) {
+	var params []string
+	if options == nil {
+		options = new(FiatMapOptions)
+	}
+
+	if options.Start != 0 {
+		params = append(params, fmt.Sprintf("start=%d", options.Start))
+	}
+
+	if options.Limit != 0 {
+		params = append(params, fmt.Sprintf("limit=%d", options.Limit))
+	}
+
+	if options.IncludeMetals {
+		params = append(params, "include_metals=true")
+	}
+
+	url := fmt.Sprintf("%s/fiat/map?%s", baseURL, strings.Join(params, "&"))
+
+	body, err := s.client.makeReq(url)
+	resp := new(Response)
+	err = json.Unmarshal(body, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("JSON Error: [%s]. Response body: [%s]", err.Error(), string(body))
+	}
+
+	var result []*FiatMapListing
+	ifcs, ok := resp.Data.(interface{})
+	if !ok {
+		return nil, ErrTypeAssertion
+	}
+
+	for _, item := range ifcs.([]interface{}) {
+		value := new(FiatMapListing)
 		b, err := json.Marshal(item)
 		if err != nil {
 			return nil, err
