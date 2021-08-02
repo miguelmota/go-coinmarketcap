@@ -72,15 +72,22 @@ type Listing struct {
 }
 
 // MapListing is the structure of a map listing
+type Platform struct {
+	ID           int    `json:"id"`
+	Name         string `json:"name"`
+	Symbol       string `json:"symbol"`
+	Slug         string `json:"slug"`
+	TokenAddress string `json:"token_address"`
+}
 type MapListing struct {
-	ID                  float64 `json:"id"`
-	Name                string  `json:"name"`
-	Symbol              string  `json:"symbol"`
-	Slug                string  `json:"slug"`
-	IsActive            int     `json:"is_active"`
-	FirstHistoricalData string  `json:"first_historical_data"`
-	LastHistoricalData  string  `json:"last_historical_data"`
-	Platform            *string
+	ID                  float64  `json:"id"`
+	Name                string   `json:"name"`
+	Symbol              string   `json:"symbol"`
+	Slug                string   `json:"slug"`
+	IsActive            int      `json:"is_active"`
+	FirstHistoricalData string   `json:"first_historical_data"`
+	LastHistoricalData  string   `json:"last_historical_data"`
+	Platform            Platform `json:"platform"`
 }
 
 // FiatMapListing is the structure of a fiat map listing
