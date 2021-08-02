@@ -274,6 +274,7 @@ func NewClient(cfg *Config) *Client {
 
 	c.common.client = c
 	c.Cryptocurrency = (*CryptocurrencyService)(&c.common)
+	c.Fiat = (*FiatService)(&c.common)
 	c.Exchange = (*ExchangeService)(&c.common)
 	c.GlobalMetrics = (*GlobalMetricsService)(&c.common)
 	c.Tools = (*ToolsService)(&c.common)
