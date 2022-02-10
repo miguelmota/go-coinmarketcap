@@ -308,6 +308,9 @@ func (s *CryptocurrencyService) Info(options *InfoOptions) (map[string]*Cryptocu
 	url := fmt.Sprintf("%s/cryptocurrency/info?%s", baseURL, strings.Join(params, "&"))
 
 	body, err := s.client.makeReq(url)
+	if err != nil {
+		return nil, err
+	}
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -358,6 +361,9 @@ func (s *CryptocurrencyService) LatestListings(options *ListingOptions) ([]*List
 	url := fmt.Sprintf("%s/cryptocurrency/listings/latest?%s", baseURL, strings.Join(params, "&"))
 
 	body, err := s.client.makeReq(url)
+	if err != nil {
+		return nil, err
+	}
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -413,6 +419,9 @@ func (s *CryptocurrencyService) Map(options *MapOptions) ([]*MapListing, error) 
 	url := fmt.Sprintf("%s/cryptocurrency/map?%s", baseURL, strings.Join(params, "&"))
 
 	body, err := s.client.makeReq(url)
+	if err != nil {
+		return nil, err
+	}
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
@@ -465,6 +474,9 @@ func (s *FiatService) Map(options *FiatMapOptions) ([]*FiatMapListing, error) {
 	url := fmt.Sprintf("%s/fiat/map?%s", baseURL, strings.Join(params, "&"))
 
 	body, err := s.client.makeReq(url)
+	if err != nil {
+		return nil, err
+	}
 	resp := new(Response)
 	err = json.Unmarshal(body, &resp)
 	if err != nil {
