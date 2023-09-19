@@ -203,9 +203,11 @@ type FiatMapOptions struct {
 
 // QuoteOptions options
 type QuoteOptions struct {
-	// Covert suppots multiple currencies command separated. eg. "BRL,USD"
+	// Covert supports multiple currencies command separated. eg. "BRL,USD"
 	Convert string
-	// Symbols suppots multiple tickers command separated. eg. "BTC,ETH,XRP"
+	// Slug supports multiple slugs command separated. eg. "bitcoin,ethereum,meld"
+	Slug string
+	// Symbols supports multiple tickers command separated. eg. "BTC,ETH,XRP"
 	Symbol string
 }
 
@@ -651,6 +653,10 @@ func (s *CryptocurrencyService) LatestQuotes(options *QuoteOptions) ([]*QuoteLat
 
 	if options.Symbol != "" {
 		params = append(params, fmt.Sprintf("symbol=%s", options.Symbol))
+	}
+
+	if options.Slug != "" {
+		params = append(params, fmt.Sprintf("slug=%s", options.Slug))
 	}
 
 	if options.Convert != "" {
